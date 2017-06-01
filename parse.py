@@ -42,9 +42,7 @@ for i in range(numc):
         connect[i][1]=  int(temp[1])
         connect[i][2]=  int(temp[2])
 
-print('{:s}'.format('finished'))
-
 
 for i in range(numxyz): print('{:12.5f} {:s} {:12.5f} {:s} {:12.5f}' .format( xyz[i][0], ', ', xyz[i][1], ', ',xyz[i][2]) )
 for i in range(numc): print('{:5d} {:s} {:5d} {:s} {:5d}' .format( connect[i][0], ', ', connect[i][1], ', ',connect[i][2]) )
-
+for i in range(numxyz): print('{:s}' .format( atm[i]))
