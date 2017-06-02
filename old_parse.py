@@ -1,18 +1,15 @@
-from itertools import takewhile
-
 filename = 'train.sdf'
 with open(filename, 'r') as f:
     data = []
     for line in f:
         if line.startswith('  -OEChem'):
             for line in f:
-                data.append(line)
+                data.append(line.strip())
                 if line.startswith("$$$$"):
                     print( '{:d} {:s}'.format(len(data), ' lines read' ) )
-                    for i in range(3) :
+                    for i in range(2) :
                         print('{:s}'.format(data[i]))
-
-                    temp = data[3].split()
+                    temp = data[1].split()
                     astr = temp[0]
                     n= len(astr)
                     if n > 3:
