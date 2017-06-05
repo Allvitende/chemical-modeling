@@ -1,3 +1,5 @@
+from periodictable import elements
+
 filename = 'train.sdf'
 startstr = "  -OEChem"
 with open(filename, 'r') as f:
@@ -5,8 +7,6 @@ with open(filename, 'r') as f:
 print( '{:d} {:s}'.format(len(data), ' lines read' ) )
 for idx, line in enumerate(data) :                                              # Search for the beginning of each block of Atoms in file and get the index
     if startstr in line :
-        # print idx, line
-        # print(data[idx + 2])
         temp = data[idx + 2].split()                                            # Store line 4 from each block into a list
         atmcount = temp[0]                                                      # Store atom count
         n = len(atmcount)
@@ -16,21 +16,20 @@ for idx, line in enumerate(data) :                                              
         else :
             numxyz = int(temp[0])
             numc = int(temp[1])
-        if numc <= 4 :                                                          # When atom count is less than 4 there are issues..need to check this
-            continue
         print('{:s}{:4d}{:s}{:4d}'.format('number of atoms =', numxyz, ' number of connections =', numc))
 
         xyz = [[0.0 for i in range(3)] for j in range (numxyz)]
-        atm = ['z' for i in range(numxyz)]
         connect = [[0 for i in range(3)] for j in range(numc)]
+        atmnum = [0 for i in range(numxyz)]
 
         for i in range(numxyz) :
             temp = data[idx + 3 + i].split()
-            atm[i] = temp[3]
+            for el in elements :                                                # Loop through periodic table to find element number for each symbol and store it
+                if temp[3] == el.symbol :
+                    atmnum[i] = el.number
             for j in range(3) :
                 xyz[i][j] = float(temp[j])
-        for i in range(numxyz): print('{:12.5f} {:s} {:12.5f} {:s} {:12.5f}' .format( xyz[i][0], ', ', xyz[i][1], ', ',xyz[i][2]) )
-        for i in range(numxyz): print('{:s}' .format( atm[i]))
+        for i in range(numxyz): print('{:d} {:s} {:12.5f} {:s} {:12.5f} {:s} {:12.5f}' .format( atmnum[i], ', ', xyz[i][0], ', ', xyz[i][1], ', ',xyz[i][2]) )
 
         for i in range(numc) :
             temp = data[idx + 3 + i + numxyz].split()
