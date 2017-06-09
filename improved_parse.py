@@ -8,9 +8,9 @@ def get_dist(l, xyz, numxyz):
     distlist = []
     for i in range(numxyz):
         if i == l:
-            distlist.extend([0])
+            distlist.extend([0])                                                # Distance between an atom and itself is zero
         else:
-            distlist.extend([distance.euclidean(xyz[l], xyz[i])])
+            distlist.extend([distance.euclidean(xyz[l], xyz[i])])               # Calculate euclidean distance between a given atom vector and all the other vectors in the molecule xyz matrix
     return distlist
 
 with open(filename, 'r') as f:
@@ -46,7 +46,7 @@ for idx, line in enumerate(data) :                                              
         # for i in range(numxyz):
         #     mergedlist.append([atmnum[i], xyz[i][0], xyz[i][1], xyz[i][2]])
         # print(mergedlist[0])
-        for l in range(numxyz):
+        for l in range(numxyz):                                                 # Build the distance matrix for each atom in the molecule
             dists.append(get_dist(l, xyz, numxyz))
         # print(dists)
         # break
