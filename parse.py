@@ -23,6 +23,9 @@ print( '{:d} {:s}'.format(len(data), ' lines read' ) )
 # Search for the beginning of each block of Atoms in file and get the index
 for idx, line in enumerate(data) :
     if startstr in line :
+        # DEBUGGING CODE
+        #print(data[idx - 1])
+        
         # Store line 4 from each block into a list
         temp = data[idx + 2].split()
         # Store atom count
@@ -59,9 +62,9 @@ for idx, line in enumerate(data) :
         #     mergedlist.append([atmnum[i], xyz[i][0], xyz[i][1], xyz[i][2]])
         # print(mergedlist[0])
 
-        # Build the distance matrix for each atom in the molecule
-        # for l in range(numxyz):
-        #     distsance_table.append(get_dist(l, xyz, numxyz))
+        Build the distance matrix for each atom in the molecule
+        for l in range(numxyz):
+            distsance_table.append(get_dist(l, xyz, numxyz))
         # TEST CODE
         # print(dists)
 
@@ -82,12 +85,12 @@ for idx, line in enumerate(data) :
 
         # Record connection information in the connection table of all Atoms in molecule
         for i in range(numc):
-            # Only supports molecules with atom count < 100 will fix later...
+            # Skips over a corrupt portion of this particular SDF file on line 655645
             if n < 3:
                 connection_table[connect[i][0] - 1][connect[i][1] - 1] = 1
                 connection_table[connect[i][1] - 1][connect[i][0] - 1] = 1
 
         # TEST CODE
-        for i in range(numxyz): print('{:s}' .format(connection_table[i]))
+        # for i in range(numxyz): print('{:s}' .format(connection_table[i]))
         # TEST CODE
         # break
