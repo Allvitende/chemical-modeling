@@ -1,27 +1,35 @@
 from periodictable import elements
 from scipy.spatial import distance
 
-filename = 'train.sdf'
-startstr = "  -OEChem"
+global filename = 'train.sdf'
+global startstr = "  -OEChem"
 
 def get_dist(l, xyz, numxyz):
     distlist = []
     for i in range(numxyz):
+        # Distance between an atom and itself is zero
         if i == l:
-            distlist.extend([0])                                                # Distance between an atom and itself is zero
+            distlist.extend([0])
         else:
-            distlist.extend([distance.euclidean(xyz[l], xyz[i])])               # Calculate euclidean distance between a given atom vector and all the other vectors in the molecule xyz matrix
+            # Calculate distance between atoms and all the other vectors in the xyz matrix (need to optimize this)
+            distlist.extend([distance.euclidean(xyz[l], xyz[i])])
     return distlist
 
+# Read entire file and parse into list of strings
 with open(filename, 'r') as f:
-    data = f.readlines()                                                        # Read entire file and parse into list of strings
+    data = f.readlines()
 print( '{:d} {:s}'.format(len(data), ' lines read' ) )
-for idx, line in enumerate(data) :                                              # Search for the beginning of each block of Atoms in file and get the index
+
+# Search for the beginning of each block of Atoms in file and get the index
+for idx, line in enumerate(data) :
     if startstr in line :
-        temp = data[idx + 2].split()                                            # Store line 4 from each block into a list
-        atmcount = temp[0]                                                      # Store atom count
+        # Store line 4 from each block into a list
+        temp = data[idx + 2].split()
+        # Store atom count
+        atmcount = temp[0]
         n = len(atmcount)
-        if n > 3 :                                                              # Scenario if atom count is greater than 999
+        # Scenario if atom count is greater than 999
+        if n > 3 :
             numxyz = int(atmcount[0:n/2])
             numc = int(atmcount[n/2:n])
         else :
@@ -36,7 +44,8 @@ for idx, line in enumerate(data) :                                              
         dists = []
         for i in range(numxyz) :
             temp = data[idx + 3 + i].split()
-            for el in elements :                                                # Loop through periodic table to find element number for each symbol and store it
+            # Loop through periodic table to find element number for each symbol and store it
+            for el in elements :
                 if temp[3] == el.symbol :
                     atmnum[i] = el.number
             for j in range(3) :
@@ -46,10 +55,13 @@ for idx, line in enumerate(data) :                                              
         # for i in range(numxyz):
         #     mergedlist.append([atmnum[i], xyz[i][0], xyz[i][1], xyz[i][2]])
         # print(mergedlist[0])
-        for l in range(numxyz):                                                 # Build the distance matrix for each atom in the molecule
+
+        # Build the distance matrix for each atom in the molecule
+        for l in range(numxyz):
             dists.append(get_dist(l, xyz, numxyz))
         # print(dists)
         # break
+
         # for i in range(numc) :
         #     temp = data[idx + 3 + i + numxyz].split()
         #     if len(temp) == 2 :
