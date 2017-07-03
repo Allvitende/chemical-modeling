@@ -25,7 +25,7 @@ for idx, line in enumerate(data) :
     if startstr in line :
         # DEBUGGING CODE
         #print(data[idx - 1])
-        
+
         # Store line 4 from each block into a list
         temp = data[idx + 2].split()
         # Store atom count
@@ -62,7 +62,7 @@ for idx, line in enumerate(data) :
         #     mergedlist.append([atmnum[i], xyz[i][0], xyz[i][1], xyz[i][2]])
         # print(mergedlist[0])
 
-        Build the distance matrix for each atom in the molecule
+        # Build the distance matrix for each atom in the molecule
         for l in range(numxyz):
             distsance_table.append(get_dist(l, xyz, numxyz))
         # TEST CODE
