@@ -74,9 +74,9 @@ def get_batch():
                 connection_table[connect[i][0] - 1][connect[i][1] - 1] = 1.0
                 connection_table[connect[i][1] - 1][connect[i][0] - 1] = 1.0
 
-            atmnum.shape = (28, 1)
-            connection_table_final = np.hstack((atmnum, connection_table))
-            train_data_connects.append([connection_table_final.flatten()])
+#            atmnum.shape = (28, 1)
+#            connection_table_final = np.hstack((atmnum, connection_table))
+            train_data_connects.append([connection_table.flatten()])
 
     return train_data_dists, train_data_connects
 
@@ -84,18 +84,39 @@ def get_batch():
 x = tf.placeholder(tf.float32, [None, 812])
 
 # Define the weights (initial value doesn't matter since these will be learned)
-W = tf.Variable(tf.random_uniform([812, 812], minval=0, dtype=tf.float32))
-b = tf.Variable(tf.random_uniform([812], minval=0, dtype=tf.float32))
+# W = tf.Variable(tf.random_uniform([812, 812], minval=0, dtype=tf.float32))
+W1 = tf.Variable(tf.truncated_normal([812, 784], stddev=0.1))
+b1 = tf.Variable(tf.truncated_normal([784], stddev=0.1))
+W2 = tf.Variable(tf.truncated_normal([784, 784], stddev=0.1))
+b2 = tf.Variable(tf.truncated_normal([784], stddev=0.1))
+W3 = tf.Variable(tf.truncated_normal([784, 784], stddev=0.1))
+b3 = tf.Variable(tf.truncated_normal([784], stddev=0.1))
+W = tf.Variable(tf.truncated_normal([784, 784], stddev=0.1))
+b = tf.Variable(tf.truncated_normal([784], stddev=0.1))
 
 # Predict output matrix
-y = tf.nn.softmax(tf.matmul(x, W) + b)
+# y = tf.nn.softmax(tf.nn.l2_normalize(tf.matmul(x, W) + b, dim= 0, epsilon=1e-12))
+# y = tf.nn.sigmoid(tf.matmul(x, W) + b)
+# y = tf.nn.relu(tf.nn.sigmoid(tf.matmul(x, W) + b))
+layer1 = tf.add(tf.matmul(x, W1), b1)
+layer1 = tf.nn.relu(layer1)
+
+layer2 = tf.add(tf.matmul(layer1, W2), b2)
+layer2 = tf.nn.relu(layer2)
+
+layer3 = tf.add(tf.matmul(layer2, W3), b3)
+layer3 = tf.nn.relu(layer3)
+
+y = tf.add(tf.matmul(layer3, W), b)
+y = tf.nn.sigmoid(y)
 
 # Actual output matrix from the training set
-y_ = tf.placeholder(tf.float32, [None, 812])
+y_ = tf.placeholder(tf.float32, [None, 784])
 
 # Calculate loss and optimize
 cross_entropy = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=y_, logits=y))
-train_step = tf.train.AdamOptimizer(0.025).minimize(cross_entropy)
+# cross_entropy = tf.reduce_sum(tf.abs(y - y_))
+train_step = tf.train.AdamOptimizer(0.001).minimize(cross_entropy)
 
 sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
@@ -112,6 +133,8 @@ for i in range(train_len):
     batch_ys = b[i]
     _, loss, acc = sess.run([train_step, cross_entropy, accuracy], feed_dict={x: batch_xs, y_: batch_ys})
     print("Loss= " + "{:.6f}".format(loss) + " Accuracy= " + "{:.5f}".format(acc))
+    print(batch_ys)
+    print(y.eval({x: batch_xs}))
 
 # Test trained model
 cumulative_accuracy = 0.0
@@ -119,6 +142,4 @@ for i in range(train_len):
     acc_batch_xs = a[i]
     acc_batch_ys = b[i]
     cumulative_accuracy += accuracy.eval(feed_dict={x: acc_batch_xs, y_: acc_batch_ys})
-    # output = sess.run([y], feed_dict={x: acc_batch_xs})
-    # print(output)
 print("Test Accuracy= {}".format(cumulative_accuracy / train_len))
