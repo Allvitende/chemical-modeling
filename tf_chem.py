@@ -131,10 +131,10 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 for i in range(train_len):
     batch_xs = a[i]
     batch_ys = b[i]
-    _, loss, acc = sess.run([train_step, cross_entropy, accuracy], feed_dict={x: batch_xs, y_: batch_ys})
+    _, loss, acc, pred = sess.run([train_step, cross_entropy, accuracy, correct_prediction], feed_dict={x: batch_xs, y_: batch_ys})
     print("Loss= " + "{:.6f}".format(loss) + " Accuracy= " + "{:.5f}".format(acc))
-    print(batch_ys)
-    print(y.eval({x: batch_xs}))
+    #print(batch_ys)
+    #print(y.eval({x: batch_xs}))
 
 # Test trained model
 cumulative_accuracy = 0.0
@@ -142,4 +142,6 @@ for i in range(train_len):
     acc_batch_xs = a[i]
     acc_batch_ys = b[i]
     cumulative_accuracy += accuracy.eval(feed_dict={x: acc_batch_xs, y_: acc_batch_ys})
+    print_correct_pred = correct_prediction.eval(feed_dict={x: acc_batch_xs, y_: acc_batch_ys})
+    print(print_correct_pred)
 print("Test Accuracy= {}".format(cumulative_accuracy / train_len))
