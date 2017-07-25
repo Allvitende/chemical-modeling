@@ -1,14 +1,14 @@
+import time
 import numpy as np
 from periodictable import elements
 from scipy.spatial import distance
 
 filename = 'train.sdf'
 startstr = "  -OEChem"
+start_time = time.time()
 
-# Read entire file and parse into list of strings
 with open(filename, 'r') as f:
     data = f.readlines()
-# print( '{:d} {:s}'.format(len(data), ' lines read' ) )
 
 def get_batch():
     train_data_dists = []
@@ -16,14 +16,14 @@ def get_batch():
     # Search for the beginning of each block of Atoms in file and get the index
     for idx, line in enumerate(data) :
         if startstr in line :
+
             # Store line 4 from each block into a list
             temp = data[idx + 2].split()
-            # Store atom count
             atmcount = temp[0]
             if int(atmcount) > 28:
-                # print("Skipping this molecule")
                 continue
             n = len(atmcount)
+
             # Scenario if atom count is greater than 999
             if n > 3 :
                 numxyz = int(atmcount[0:n/2])
@@ -50,10 +50,21 @@ def get_batch():
             for a in range(numxyz):
                 distance_table[a][0] = float(atmnum[a])
 
+            # for l in range(numxyz):
+            #     for i in range(numxyz):
+            #        distance_table[l][i + 1] = distance.euclidean(xyz[l], xyz[i])
+            
             for l in range(numxyz):
                 for i in range(numxyz):
-                    distance_table[l][i + 1] = distance.euclidean(xyz[l], xyz[i])
-
+                    if i > 0: 
+                        if i - l == 1:
+                            continue
+                    if ((distance_table[l][i + 1] > 0.0) or (distance_table[i][l + 1] > 0.0)):
+                        continue
+                    else:
+                        ed = distance.euclidean(xyz[l], xyz[i])
+                        distance_table[l][i + 1] = ed
+                        distance_table[i][l + 1] = ed
             train_data_dists.append([distance_table.flatten()])
 
             for i in range(numc) :
@@ -68,15 +79,13 @@ def get_batch():
                     connect[i][0] = int(temp[0])
                     connect[i][1] = int(temp[1])
                     connect[i][2] = int(temp[2])
+
             # Record connection information in the connection table of all Atoms in molecule
             for i in range(numc):
                 connection_table[connect[i][0] - 1][connect[i][1] - 1] = 1.0
                 connection_table[connect[i][1] - 1][connect[i][0] - 1] = 1.0
-
-#            atmnum.shape = (28, 1)
-#            connection_table_final = np.hstack((atmnum, connection_table))
             train_data_connects.append([connection_table.flatten()])
 
     return train_data_dists, train_data_connects
-
+print("--- %s seconds ---" % (time.time() - start_time))
 
