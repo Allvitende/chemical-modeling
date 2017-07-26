@@ -13,11 +13,8 @@ with open(filename, 'r') as f:
 def get_batch():
     train_data_dists = []
     train_data_connects = []
-    # Search for the beginning of each block of Atoms in file and get the index
     for idx, line in enumerate(data) :
         if startstr in line :
-
-            # Store line 4 from each block into a list
             temp = data[idx + 2].split()
             atmcount = temp[0]
             if int(atmcount) > 28:
@@ -40,7 +37,6 @@ def get_batch():
 
             for i in range(numxyz) :
                 temp = data[idx + 3 + i].split()
-                # Loop through periodic table to find element number for each symbol and store it
                 for el in elements :
                     if temp[3] == el.symbol :
                         atmnum[i] = float(el.number)
@@ -49,10 +45,6 @@ def get_batch():
 
             for a in range(numxyz):
                 distance_table[a][0] = float(atmnum[a])
-
-            # for l in range(numxyz):
-            #     for i in range(numxyz):
-            #        distance_table[l][i + 1] = distance.euclidean(xyz[l], xyz[i])
             
             for l in range(numxyz):
                 for i in range(numxyz):
